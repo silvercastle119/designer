@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="ko"> 
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" /> 
+<title>다산책길 — 발길 닿는 곳마다 다사로움</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="다산책길 - 이벤트 페이지">
+<meta property="og:description" content="발길 닿는 곳마다 다사로움, 남양주시 다산동 정약용도서관 일대 상권 공동브랜드 다산책길의 가게와 소식을 한곳에서.">
+<meta property="og:url" content="https://www.dasanchaekgil.kr/dasan-event">
+<meta property="og:image" content="https://dasanchaekgil.kr/images/og-thumbnail.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
+
+<style>
+  :root{
+    --primary:#0082FF;--secondary:#0082FF;--accent:#6BBBFF;--ink:#111;--muted:#464646;--border:#575B5D;
+    --bg:#fff;--bg-accent:#B5DDFF;
+    --yellow:#FFC857;
+    --gray:#B0B0B0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,-apple-system,system-ui,sans-serif;scroll-behavior:smooth}
+  body{display:flex;justify-content:center;min-width:1280px}
+  .page{width:100%;max-width:1920px;min-height:100vh;background:#fff;overflow:hidden;display:flex;flex-direction:column;align-items:center}
+
+  /* 헤더 */
+  .header-hide{transform:translateY(-110px);transition:transform 0.38s cubic-bezier(.4,0,.2,1);}
+  .header{transition:transform 0.38s cubic-bezier(.4,0,.2,1);} /* 헤더 트랜지션 */
+  .header{position:fixed;top:0;left:0;width:100%;height:110px;padding:24px 60px;display:flex;justify-content:space-between;align-items:center;z-index:100;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+  .logo{width:159px;height:73.38px;object-fit:contain}
+  .nav{display:flex;align-items:center;gap:57px}
+  .nav-link{color:var(--muted);font-size:22.88px;font-weight:500;text-transform:capitalize;line-height:33.18px;cursor:pointer}
+  .nav-img {width: 53px; height: 29px; display: block; /* 인라인 여백 제거 */}
+
+  /* 메인 */
+  .main{
+    width:100%;
+    max-width:1600px;
+    padding:160px 60px 40px;
+    margin:0 auto;
+  }
+  .event-hero{
+    margin-bottom:40px;
+  }
+  .event-hero h1{
+    font-size:50px;
+    font-weight:700;
+    margin-bottom:8px;
+    color: var(--primary);
+  }
+  .event-hero p{
+    font-size:18px;
+    color:var(--muted);
+  }
+
+  .event-section{
+    width:100%;
+    margin-bottom:60px;
+  }
+  .event-section:last-of-type{
+    margin-bottom:0;
+  }
+  .event-section-title{
+    font-size:20px;
+    font-weight:500;
+    margin-bottom:16px;
+    color: var(--muted);
+  }
+  .event-list{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr)); /* 항상 2열 */
+    gap:20px;
+  }
+
+  .event-loading,
+  .event-error,
+  .event-empty{
+    grid-column:1 / -1;
+    padding:24px 0;
+    text-align:center;
+    font-size:14px;
+    color:var(--muted);
+  }
+  .event-error{
+    color:#c00;
+  }
+
+  /* 카드 전체 클릭 가능 처리 */
+  .event-card-link{
+    display:block;
+    color:inherit;
+    text-decoration:none;
+  }
+  .event-card{
+    position:relative;
+    background:#fff;
+    border-radius:16px;
+    padding:20px 22px 18px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.06);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    transition:transform .16s ease, box-shadow .16s ease;
+  }
+  .event-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 24px rgba(0,0,0,0.08);
+  }
+
+  .event-card-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .event-title{
+    font-size:20px;
+    font-weight:600;
+  }
+
+  /* 배지 색상 */
+  .event-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+  }
+  .event-badge--ongoing{
+    background:#E6F3FF;
+    color:var(--primary);
+  }
+  .event-badge--upcoming{
+    background:#FFF4D6;
+    color:#C87A00;
+  }
+  .event-badge--ended{
+    background:#F0F0F0;
+    color:var(--gray);
+  }
+
+  .event-meta{
+    font-size:14px;
+    color:var(--muted);
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .event-meta span+span::before{
+    content:"•";
+    margin:0 6px 0 2px;
+    color:#ccc;
+  }
+
+  .event-desc{
+    font-size:15px;
+    line-height:1.5;
+  }
+  .event-tags{
+    font-size:13px;
+    color:#666;
+  }
+
+  /* 상세보기 색상: 상태별 */
+  .event-link-text{
+    margin-top:auto;
+    font-size:14px;
+    font-weight:500;
+    text-decoration:underline;
+  }
+  .event-card[data-status="ongoing"] .event-link-text{
+    color:var(--primary);
+  }
+  .event-card[data-status="upcoming"] .event-link-text{
+    color:#C87A00;
+  }
+  .event-card[data-status="ended"] .event-link-text{
+    color:var(--gray);
+  }
+
+  /* 푸터 */
+  .footer-wrap{width:100%;padding:80px 64px;background:#fff;border-top:0px solid #E5E7EB;}
+  .footer{max-width:1800px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:60px;}
+  .footer-left{display:flex;flex-direction:column;gap:40px}
+  .footer-logo{width:149px;height:69px}
+  .footer-desc{opacity:0.6;color:var(--muted);font-size:21px;font-weight:400;line-height:30px;margin-top:12px}
+  .footer-social{display:flex;gap:35px}
+  .footer-social img{width:36px;height:36px;cursor:pointer}
+  .footer-partners{height:261px;overflow:hidden;display:inline-flex;justify-content:center;align-items:center;gap:28px;padding-top:150px;}
+  .partner-1{margin-right:0px}
+  .partner-2{margin-right:-5px}
+  .partner-3{margin-right:2px}
+  .partner-4{margin-right:5px}
+  .partner-5{margin-right:0}
+  
+
+  /* 맨 위로 플로팅 */
+  .floating-btn {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    width: 60px;
+    height: 60px;
+    background: var(--primary);
+    border: none;
+    border-radius: 50%;
+    /*box-shadow: 0 4px 12px rgba(0, 94, 152, 0.3);*/
+    cursor: pointer;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    color: #fff;
+  }
+
+  .floating-btn:hover {
+    background: #6BBBFF;
+    transform: translateY(-4px);
+    /*box-shadow: 0 6px 16px rgba(0, 130, 255, 0.4);8*/
+  }
+
+  .floating-btn:active {
+    transform: translateY(-2px);
+  }
+
+  .floating-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+  
+  /* 반응형 - 모바일 */
+
+  @media (max-width: 540px) {
+
+  html, body {
+    width: 100vw !important;    /* 뷰포트 기반으로 가로 확장 */
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden !important;
+    
+  }
+  .page {
+    width: 100vw !important;    /* ★ 페이지 컨테이너도 확장 */
+    min-width: 0 !important;
+    max-width: none !important; /* 최대값 제한 해제 */
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: visible;
+    box-sizing: border-box;
+  }
+  /* ========== 헤더 ========== */
+  .header {width: 100vw; max-width: 375px; padding: 24px 20px; margin: 0 auto; background: #fff; box-shadow: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; position: relative; height: auto; min-width: 0; }
+  .logo { width: 131px; height: 61px; object-fit: contain; margin: 0; padding: 0; display: block; }
+  .nav { width: 100%; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: clamp(10px, 8vw, 40px); margin: 0; padding: 0; }
+  .nav-link { color: #464646; font-size: 18px; font-family: Pretendard, sans-serif; font-weight: 450; text-decoration: underline; text-transform: capitalize; line-height: 22.78px; background: none; border: none; cursor: pointer; padding: 0; margin: 0; display: flex; justify-content: center; align-items: center; }
+  .nav-img {width: 35px; /* 원하는 크기로 조절 */height: auto; /* 비율 유지 */}
+  /* ========== 메인 영역 ========== */
+    .main{
+      padding:20px 16px 20px;
+      max-width:375px;
+    }
+    .event-hero h1{
+      font-size:30px;
+    }
+    .event-hero p{
+      font-size:16px;
+      width: 310px;
+    }
+    .event-list{
+      grid-template-columns:1fr; /* 모바일에서는 1열 */
+    }
+
+    .event-badge{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        padding:4px 10px;
+        border-radius:999px;
+        font-size:14px;
+        font-weight:600;
+        width: fit-content;
+    }
+  .event-meta{
+    font-size:14px;
+    color:var(--muted);
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .event-meta span+span::before{
+    content:"•";
+    margin:0 6px 0 2px;
+    color:#ccc;
+  }
+
+  .event-desc{
+    font-size:16px;
+    line-height:1.3;
+  }
+  .event-tags{
+    font-size:13px;
+    color:#666;
+  }
+
+  .event-card-header{
+    display:flex;
+    align-items:flex-start;   /* 전체를 위 기준으로 */
+    gap:8px;
+  }
+
+  .event-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:600;
+    width:auto;
+    white-space:nowrap;
+    align-self:flex-start;    /* 세로로 안 늘어나고, 자기 높이만 */
+  }
+
+  .event-title{
+    font-size:20px;
+    font-weight:600;
+  }
+  /* ========== 푸터 ========= */
+
+  /* ★핵심 1: 부모 컨테이너(.footer-wrap) 좌우 패딩 제거 */
+  .footer-wrap {
+    padding: 0 0 100px 0 !important; /* 상하만 유지, 좌우는 0 */
+    width: 100%;
+  }
+
+  /* ★핵심 2: .footer 좌우 여백 최소화 */
+  .footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end !important;  /* 하단 정렬 */
+    
+    padding: 0 16px !important; /* 좌우 8px만 (거의 없음) */
+    margin: 0 !important;
+    width: 100%;
+    box-sizing: border-box;
+    gap: 10px; /* 좌우 그룹 사이 최소 간격 */
+  }
+
+  /* [왼쪽 그룹] 너비 최대 확대 */
+  .footer-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end !important; 
+    gap: 30px;
+    
+    /* ★핵심: 너비 대폭 확대 */
+    width: 60% !important;
+    flex-shrink: 0;
+  }
+
+  .footer-left > div:first-child { gap: 10px; }
+  .footer-logo { width: 110px; height: auto; margin: 0; }
+
+  /* 설명글 2줄 고정 */
+  .footer-desc {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 14.5px;
+    color: #464646;
+    opacity: 0.6;
+    margin: 0;
+    
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: keep-all;
+  }
+
+  .footer-social { display: flex; gap: 14px; margin: 0; align-items: flex-end;}
+  .footer-social img { width: 24px; height: 24px; display: block; }
+
+
+  /* [오른쪽 그룹] 너비 최대 확대 */
+  .footer-partners {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* ★핵심: 우측 정렬 */
+    justify-content: flex-end !important;
+    gap: 12px;
+    width: 36% !important;
+    height: 200px;
+    flex-shrink: 0;
+    padding: 0 0 5px 0 !important;
+    margin: 0 !important;
+  }
+
+  .partner-logo {
+    max-height: 16px;
+    width: auto !important;
+    margin-left: auto !important;
+    object-fit: contain;
+    object-position: right;
+  }
+
+  /* 개별 로고 조정 */
+  .partner-1 { max-height: 16px !important; } /* 남양주 */
+  .partner-2 { max-height: 13px !important; } /* 경기대진 */
+  .partner-3 { max-height: 13px !important; } /* 경기북부 */
+  .partner-4 { max-height: 9px !important; } /* 다산상인회 */
+  .partner-5 { max-height: 9px !important; } /* FRONT KIT */
+  /* ========== 플로팅버튼 ========= */
+  .floating-btn {
+    width: 50px;
+    height: 50px;
+    bottom: 24px;
+    right: 24px;
+  }
+  
+  .floating-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+.nav-link, .nav-link * {
+  text-decoration: none !important;
+}
+
+
+
+</style>
+</head>
+<body>
+<div class="page">
+  <!-- 헤더 -->
+  <header class="header">
+    <a href="dasan-home.html" class="logo-link">
+      <img class="logo" src="images/logo.svg" alt="다산책길" />
+    </a>
+    <nav class="nav">
+      <a class="nav-link" href="dasan-brand.html">Brand</a>
+      <a class="nav-link underline" href="https://www.instagram.com/dasan_chaek_gil/" target="_blank" rel="noopener">Instagram</a>
+      <a class="nav-link" href="dasan-event.html">Event</a>
+        <a href="https://www.nyj.go.kr/www/index.do" target="_blank" rel="noopener">
+            <img class="nav-img" src="images/namyangju-logo.svg" alt="KO" />
+        </a>
+    </nav>
+  </header>
+
+  <!-- 메인: 이벤트 -->
+  <main class="main">
+    <section class="event-hero">
+      <h1>다산책길 EVENT</h1>
+      <p>다산책길에서 즐길 수 있는 이벤트들을 한 곳에서 확인해 보세요!</p>
+    </section>
+    <!-- 진행 중 -->
+    <section class="event-section" aria-label="진행 중 이벤트">
+      <h2 class="event-section-title">진행 중 이벤트</h2>
+      <div class="event-list" id="event-list-ongoing">
+        <p class="event-loading">불러오는 중...</p>
+      </div>
+    </section>
+
+    <!-- 예정 -->
+    <section class="event-section" aria-label="예정된 이벤트">
+      <h2 class="event-section-title">예정 이벤트</h2>
+      <div class="event-list" id="event-list-upcoming">
+        <p class="event-loading">불러오는 중...</p>
+      </div>
+    </section>
+
+    <!-- 종료 -->
+    <section class="event-section" aria-label="종료된 이벤트">
+      <h2 class="event-section-title">종료된 이벤트</h2>
+      <div class="event-list" id="event-list-ended">
+        <p class="event-loading">불러오는 중...</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="footer-wrap">
+    <div class="footer">
+      <div class="footer-left">
+        <div>
+          <img class="footer-logo" src="images/logo-footer.svg" alt="" />
+          <div class="footer-desc">발길 닿는 곳마다 다사로움,<br/>남양주시 다산동 문화거리입니다.</div>
+        </div>
+        <div class="footer-social">
+          <img src="images/icon-instagram.svg" alt="Instagram" onclick="window.open('https://www.instagram.com/dasan_chaek_gil/','_blank')" />
+          <a href="tel:031-569-0010">
+            <img src="images/icon-phone.svg" alt="Phone" />
+          </a>
+        </div>
+      </div>
+      
+      <!-- 협력사 로고 -->
+      <div class="footer-partners">
+        <img class="partner-logo partner-1" src="images/partner-1.svg" alt="협력사1" style="width:52.25px;height:27.55px" />
+        <img class="partner-logo partner-2" src="images/partner-2.svg" alt="협력사2" style="width:145px;height:20px" />
+        <img class="partner-logo partner-3" src="images/partner-3.svg" alt="협력사3" style="width:173px;height:24px" />
+        <img class="partner-logo partner-4" src="images/partner-4.svg" alt="협력사4" style="width:151px;height:20px" />
+        <img class="partner-logo partner-5" src="images/partner-5.svg" alt="협력사5" style="width:149px;height:20px" />
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- 맨위로 플로팅 -->
+<button class="floating-btn" id="scrollToTop" aria-label="맨 위로">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 19V5M12 5L5 12M12 5L19 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+<script>
+  if (history.scrollRestoration) { history.scrollRestoration = 'manual'; }
+  window.addEventListener('load', () => { window.scrollTo(0, 0); });
+  let lastScrollY=window.pageYOffset; // 마지막 스크롤 위치 저장
+  window.addEventListener('scroll',()=>{ // 스크롤 이벤트 감지
+    const header=document.querySelector('.header'); // 헤더 선택
+    if(window.pageYOffset>lastScrollY&&window.pageYOffset>70){header.classList.add('header-hide');} // 아래로 내릴 때 숨김
+    else{header.classList.remove('header-hide');} // 위로 올릴 때 표시
+    lastScrollY=window.pageYOffset; // 위치 갱신
+  }); // 헤더 스크롤방향 감지 고정
+
+    // 맨 위로 올라가기 버튼
+  const scrollToTopBtn = document.getElementById('scrollToTop');
+
+  scrollToTopBtn.addEventListener('click', () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
+
+  // 스크롤 위치에 따라 버튼 표시/숨김
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+      scrollToTopBtn.style.opacity = '1';
+      scrollToTopBtn.style.pointerEvents = 'auto';
+    } else {
+      scrollToTopBtn.style.opacity = '0';
+      scrollToTopBtn.style.pointerEvents = 'none';
+    }
+  });
+
+  // 초기 상태
+  if (window.scrollY <= 300) {
+    scrollToTopBtn.style.opacity = '0';
+    scrollToTopBtn.style.pointerEvents = 'none';
+  }
+
+  // 섹션별로 종료 날짜(data-end) 기준 정렬 (빠른 순)
+  function sortEventsByEndDate() {
+    const sections = document.querySelectorAll('.event-list');
+    sections.forEach(section => {
+      const cards = Array.from(section.querySelectorAll('.event-card-link'));
+      cards.sort((a, b) => {
+        const aEnd = a.querySelector('.event-card').dataset.end;
+        const bEnd = b.querySelector('.event-card').dataset.end;
+        return new Date(aEnd) - new Date(bEnd);
+      });
+      cards.forEach(card => section.appendChild(card));
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', sortEventsByEndDate);
+
+
+//Json 파일 연동
+  async function loadEvents() {
+    try {
+      const res = await fetch('https://script.google.com/macros/s/AKfycbwEXZ0wKvk-E1Um2Hv32TYK4EHluiWgZY_KMLUKNzpp6MXkaPfi0xrBMslXZgUxSVuoEQ/exec');
+      const data = await res.json();
+  
+      renderSection('ongoing', data.ongoing || []);
+      renderSection('upcoming', data.upcoming || []);
+      renderSection('ended',   data.ended   || []);
+  
+      sortEventsByEndDate(); // 데이터 들어온 뒤 정렬
+    } catch (e) {
+      console.error('이벤트 데이터를 불러오지 못했습니다.', e);
+      ['ongoing','upcoming','ended'].forEach(status => {
+        const container = document.getElementById(`event-list-${status}`);
+        if (!container) return;
+        container.innerHTML = '<p class="event-error">이벤트를 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.</p>';
+      });
+    }
+  }
+
+function renderSection(status, events) {
+  const container = document.getElementById(`event-list-${status}`);
+  if (!container) return;
+
+  // 기존 로딩/에러/빈 문구 제거
+  const msg = container.querySelector('.event-loading, .event-error, .event-empty');
+  if (msg) msg.remove();
+
+  if (!events.length) {
+    const empty = document.createElement('p');
+    empty.className = 'event-empty';
+    empty.textContent =
+      status === 'ongoing' ? '진행 중인 이벤트가 없습니다.' :
+      status === 'upcoming' ? '예정된 이벤트가 없습니다.' :
+      '종료된 이벤트가 없습니다.';
+    container.appendChild(empty);
+    return;
+  }
+
+  // 종료일 오름차순 정렬 (문자열 기준)
+  events.sort((a, b) => {
+    const aStr = String(a.end).slice(0, 10);
+    const bStr = String(b.end).slice(0, 10);
+    return aStr.localeCompare(bStr);
+  });
+
+  events.forEach(ev => {
+    const link = document.createElement('a');
+    link.className = 'event-card-link';
+    link.href = ev.link || 'https://www.instagram.com/dasan_chaek_gil/';
+    link.target = '_blank';
+    link.rel = 'noopener';
+
+    const article = document.createElement('article');
+    article.className = 'event-card';
+    article.dataset.status = status;
+    article.dataset.end = ev.end;
+
+    const statusLabel =
+      status === 'ongoing' ? '진행' :
+      status === 'upcoming' ? '예정' : '종료';
+    const badgeClass =
+      status === 'ongoing' ? 'event-badge--ongoing' :
+      status === 'upcoming' ? 'event-badge--upcoming' : 'event-badge--ended';
+
+    article.innerHTML = `
+      <header class="event-card-header">
+        <p class="event-badge ${badgeClass}">${statusLabel}</p>
+        <h3 class="event-title">${ev.title}</h3>
+      </header>
+      <p class="event-meta">
+        <span>
+          <time datetime="${ev.start}">${formatDateYMD(ev.start)}</time> ~
+          <time datetime="${ev.end}">${formatDateYMD(ev.end)}</time>
+        </span>
+        <span>${ev.place}</span>
+      </p>
+      <p class="event-desc">${ev.description}</p>
+      <p class="event-tags">${(ev.tags || []).map(t => '#' + t).join(' ')}</p>
+      <p class="event-link-text">상세보기</p>
+    `;
+
+    link.appendChild(article);
+    container.appendChild(link);
+  });
+}
+
+function formatDateYMD(value) {
+  if (!value) return '';
+  const ymd = String(value).slice(0, 10); // 2025-12-04
+  return ymd.replace(/-/g, '.');          // 2025.12.04
+}
+
+document.addEventListener('DOMContentLoaded', loadEvents);
+
+</script>
+</body>
+</html>
